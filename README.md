@@ -12,15 +12,19 @@ Some are wrapped around other tools and other are implemented by me. At end its 
 
 ## Tools Used
 ### OSINT / Information Gathering
-1) Chaos -> API Key Required
-2) AbuseIP DB -> API Key Required
-3) IP Qualtiy Score -> API Key Required
-4) Alien Vault OTX -> API Key Required
-5) Virus Total -> API Key Required 
+|Tool|API|Comments|
+|----|----|-------|
+|Chaos| API Key Required| |
+|AbuseIP DB |API Key Required| |
+|IP Qualtiy Score |API Key Required| |
+|Alien Vault OTX | API Key Required | |
+|Virus Total | API Key Required | |
 
 ### Attack Surface Management
-1) Sub Finder
-2) Chaos -> API Key Required 
+|Tool| API | Comment|
+|----|----|-------|
+| Sub Finder | | Built in Tool|
+|Chaos |API Key Required | |
 
 ### Threat Hunting
 

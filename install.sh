@@ -27,7 +27,7 @@ install_dependencies() {
     # Update package list
     apt-get update
 
-    # Install dbus if not already installed
+    # Install dbus
     if ! command_exists dbus-launch; then
         log_message "Installing dbus..."
         apt-get install -y dbus
@@ -35,7 +35,7 @@ install_dependencies() {
         log_message "dbus is already installed."
     fi
 
-    # Install feh for setting wallpaper
+    # Install feh
     if ! command_exists feh; then
         log_message "Installing feh..."
         apt-get install -y feh
@@ -43,7 +43,7 @@ install_dependencies() {
         log_message "feh is already installed."
     fi
 
-    # Install jq for JSON parsing
+    # Install jq
     if ! command_exists jq; then
         log_message "Installing jq..."
         apt-get install -y jq
@@ -51,12 +51,20 @@ install_dependencies() {
         log_message "jq is already installed."
     fi
 
-    # Install git if not already installed
+    # Install git
     if ! command_exists git; then
         log_message "Installing git..."
         apt-get install -y git
     else
         log_message "git is already installed."
+    fi
+
+    # Install libpcap-dev for Naabu
+    if ! dpkg -s libpcap-dev >/dev/null 2>&1; then
+        log_message "Installing libpcap-dev..."
+        apt-get install -y libpcap-dev
+    else
+        log_message "libpcap-dev is already installed."
     fi
 
     log_message "Dependencies installation completed."
@@ -90,107 +98,84 @@ install_docker() {
     log_message "Docker installation completed."
 }
 
-# Function to install Portainer
-install_portainer() {
-    if docker ps -a --format '{{.Names}}' | grep -q "^portainer$"; then
-        log_message "Portainer is already installed. Skipping installation."
-        return
-    fi
-
-    log_message "Installing Portainer..."
-    docker volume create portainer_data
-    docker run -d -p 9000:9000 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    log_message "Portainer installation completed."
-}
-
-# Function to install Python
-install_python() {
-    if command_exists python3; then
-        log_message "Python is already installed. Skipping installation."
-        return
-    fi
-
-    log_message "Installing Python..."
-    apt-get update
-    apt-get install -y python3 python3-pip
-    log_message "Python installation completed."
-}
-
-# Function to install Go
+# Function to install GoLang
 install_go() {
     if command_exists go; then
         log_message "Go is already installed. Skipping installation."
         return
     fi
 
-    log_message "Installing Go..."
-    local go_version="1.21.1"
-    wget https://go.dev/dl/go${go_version}.linux-amd64.tar.gz
+    log_message "Installing GoLang..."
+    local go_version="1.23.3"
+    wget https://go.dev/dl/go${go_version}.linux-amd64.tar.gz -O /tmp/go${go_version}.linux-amd64.tar.gz
     rm -rf /usr/local/go
-    tar -C /usr/local -xzf go${go_version}.linux-amd64.tar.gz
-    rm go${go_version}.linux-amd64.tar.gz
+    tar -C /usr/local -xzf /tmp/go${go_version}.linux-amd64.tar.gz
+    rm /tmp/go${go_version}.linux-amd64.tar.gz
     export PATH=$PATH:/usr/local/go/bin
     echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
     source ~/.profile
-    log_message "Go installation completed."
+    log_message "GoLang installation completed."
 }
 
-# Function to set up and start ELK stack using docker-elk repository
-setup_elk() {
-    local repo_url="https://github.com/deviantony/docker-elk"
-    local repo_dir="docker-elk"
+# Function to install Project Discovery Tools
+install_project_discovery_tools() {
+    log_message "Installing Project Discovery Tools..."
 
-    if [ -d "$repo_dir" ]; then
-        log_message "Repository $repo_dir already exists. Pulling latest changes..."
-        cd "$repo_dir" && git pull
-    else
-        log_message "Cloning the repository from $repo_url..."
-        git clone "$repo_url"
-        cd "$repo_dir"
-    fi
+    # Chaos
+    log_message "Installing Chaos..."
+    go install -v github.com/projectdiscovery/chaos-client/cmd/chaos@latest
 
-    log_message "Setting up the ELK stack..."
-    docker compose up setup
+    # Nuclei
+    log_message "Installing Nuclei..."
+    go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 
-    log_message "Starting the ELK stack..."
-    docker compose up -d
+    # Subfinder
+    log_message "Installing Subfinder..."
+    go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 
-    log_message "ELK stack setup and started successfully."
+    # Naabu
+    log_message "Installing Naabu..."
+    go install -v github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
 
-    # Test the ELK stack
-    log_message "Testing ELK stack with curl..."
-    if curl -u elastic:changeme http://localhost:9200; then
-        log_message "ELK stack is running and accessible."
-    else
-        log_message "Failed to access ELK stack. Please check the logs for details."
-    fi
+    # shuffledns
+    log_message "Installing shuffledns..."
+    go install -v github.com/projectdiscovery/shuffledns/cmd/shuffledns@latest
 
-    # Go back to the parent directory for wallpaper change
-    cd ..
+    log_message "Project Discovery Tools installation completed."
 }
 
-# Function to change wallpaper using feh
-change_wallpaper() {
-    local wallpaper_path="$(pwd)/wallpaper.png"
-
-    if [ ! -f "$wallpaper_path" ]; then
-        log_message "Wallpaper file not found at $wallpaper_path. Skipping wallpaper change."
+# Function to install Node.js and NPM
+install_nodejs() {
+    if command_exists node; then
+        log_message "Node.js is already installed. Skipping installation."
         return
     fi
 
-    log_message "Changing wallpaper using feh..."
-    feh --bg-scale "$wallpaper_path"
-    log_message "Wallpaper changed."
+    log_message "Installing Node.js..."
+    wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    source ~/.nvm/nvm.sh
+    nvm install --lts
+    log_message "Node.js installation completed."
+
+    log_message "Installing NPM..."
+    apt install -y npm
+    log_message "NPM installation completed."
+}
+
+# Function to install PM2 and n8n
+install_pm2_n8n() {
+    log_message "Installing PM2 and n8n..."
+    npm install -g pm2 n8n
+    log_message "PM2 and n8n installation completed."
 }
 
 # Main script execution
 check_root
 install_dependencies
 install_docker
-install_portainer
-install_python
 install_go
-setup_elk
-change_wallpaper
+install_project_discovery_tools
+install_nodejs
+install_pm2_n8n
 
 log_message "All tasks completed successfully!"

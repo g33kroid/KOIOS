@@ -1,6 +1,8 @@
 # Ignore the installation log file
 installation_log.txt
+package*.json
 
 # Ignore directories
 activepieces/
 docker-elk/
+certs/

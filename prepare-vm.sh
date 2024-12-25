@@ -167,8 +167,20 @@ install_pm2_n8n() {
     log_message "Installing PM2 and n8n..."
     npm install -g pm2 n8n
     log_message "PM2 and n8n installation completed."
+    log_message "Starting n8n"
+    pm2 start n8n
+    log_message "Adding n8n to Startup"
+    pm2 startup
+    log_message "Saving the Process for Reboot"
+    pm2 save
 }
 
+install_portainer() {
+    log_message "Installing Portainer CE for Docker Management"
+    docker volume create portainer_data
+    docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:2.21.5
+    log_message "Portainer Installed\nPlease Visit https://localhost:9443 and set the Username and Password To Monitor Docker Container before Proceeding"
+}
 # Main script execution
 check_root
 install_dependencies
@@ -177,5 +189,7 @@ install_go
 install_project_discovery_tools
 install_nodejs
 install_pm2_n8n
+install_portainer
+
 
 log_message "All tasks completed successfully!"

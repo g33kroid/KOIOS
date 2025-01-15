@@ -1,0 +1,44 @@
+{
+    "AbuseIPDB": {
+        "Type":"OSINT",
+        "Index":"abuseipdb",
+        "Tool": "Plugins/AbuseIPDB.py",
+        "API":""
+    },
+    "AlienVaultOTX": {
+        "Type":"OSINT",
+        "Index":"alienvaultotx",
+        "Tool": "Plugins/AlienVaultOTX.py",
+        "API":""
+    },
+    "IPInfo": {
+        "Type":"OSINT",
+        "Index":"ipinfo",
+        "Tool": "Plugins/IPInfo.py",
+        "API":""
+    },
+    "IPQOS": {
+        "Type":"OSINT",
+        "Index":"ipqos",
+        "Tool": "Plugins/IPQualityScore.py",
+        "API":""
+    },
+    "Chaos": {
+        "Type":"Passive Scan",
+        "Index":"chaos",
+        "Tool": "/root/go/bin/chaos",
+        "API":""
+    },
+    "SubFinder":{
+        "Type":"Active Scan",
+        "Index":"subfinder",
+        "Tool": "Plugins/SubFinder.py",
+        "API":""
+    },
+    "RBLChecker": {
+        "Type":"Passive Scan",
+        "Index":"rblchecker",
+        "Tool": "Plugins/RBLChecker.py",
+        "API":""
+    }
+}
